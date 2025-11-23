@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpinaBot Widget – Modern UI</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #05060a;
+      --bg-soft: rgba(255,255,255,0.06);
+      --bg-softer: rgba(255,255,255,0.035);
+      --text: #e8ecf4;
+      --muted: #a9b1c3;
+      --brand1: #7c5cff;
+      --brand2: #22d3ee;
+      --brand3: #a3e635;
+      --ring: rgba(124,92,255,0.5);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --shadow-soft: 0 12px 40px rgba(0,0,0,0.45);
+      --shadow-glow: 0 0 0 1px rgba(255,255,255,0.06),
+                     0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 10% -10%, rgba(124,92,255,.25), transparent 60%),
+                  radial-gradient(1000px 800px at 110% 0%, rgba(34,211,238,.18), transparent 55%),
+                  radial-gradient(1200px 900px at 50% 120%, rgba(163,230,53,.10), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* Ambient animated blobs */
+    .blob{
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      filter: blur(70px);
+      opacity: .45;
+      z-index: -1;
+      border-radius: 50%;
+      animation: float 18s ease-in-out infinite;
+      transform: translate3d(0,0,0);
+    }
+    .blob.b1{
+      background: conic-gradient(from 120deg, var(--brand1), transparent 55%);
+      top: -180px; left: -160px;
+      animation-duration: 20s;
+    }
+    .blob.b2{
+      background: conic-gradient(from 20deg, var(--brand2), transparent 60%);
+      top: -220px; right: -140px;
+      animation-duration: 24s;
+    }
+    .blob.b3{
+      background: conic-gradient(from 220deg, var(--brand3), transparent 60%);
+      bottom: -260px; left: 25%;
+      animation-duration: 28s;
+    }
+    @keyframes float{
+      0%,100%{ transform: translateY(0) translateX(0) scale(1); }
+      50%{ transform: translateY(35px) translateX(18px) scale(1.06); }
+    }
+
+    /* Layout */
+    .container{
+      width: min(1150px, 92vw);
+      margin: 0 auto;
+      padding: 18px 0 80px;
+    }
+
+    /* Navbar */
+    nav{
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-10px);
+      opacity: 0;
+      animation: dropIn .9s ease forwards;
+    }
+    @keyframes dropIn{
+      to{ transform: translateY(0); opacity: 1; }
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px;
+    }
+    .brand-dot{
+      width: 32px; height: 32px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fff, var(--brand1) 40%, transparent 60%),
+                  radial-gradient(circle at 70% 80%, var(--brand2), transparent 55%);
+      box-shadow: 0 0 24px rgba(124,92,255,.7);
+    }
+    .nav-links{
+      display:flex; gap: 8px; align-items:center;
+    }
+    .nav-links a{
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: all .25s ease;
+    }
+    .nav-links a:hover{
+      color: var(--text);
+      background: var(--bg-soft);
+      transform: translateY(-1px);
+    }
+
+    .cta{
+      display:flex; align-items:center; gap:8px;
+    }
+    .btn{
+      position: relative;
+      border: 0;
+      color: white;
+      font-weight: 700;
+      letter-spacing: .2px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--brand1), var(--brand2));
+      box-shadow: 0 10px 30px rgba(34,211,238,.25);
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      overflow:hidden;
+    }
+    .btn:hover{
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(124,92,255,.35);
+    }
+    .btn:active{ transform: translateY(0) scale(.98); }
+    .btn.secondary{
+      background: var(--bg-soft);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: none;
+    }
+    .btn.secondary:hover{
+      background: rgba(255,255,255,.1);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Hero */
+    .hero{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 22px;
+      align-items: center;
+      margin-top: 26px;
+    }
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .hero-card{
+      background: linear-gradient(180deg, var(--bg-soft), var(--bg-softer));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-glow);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(12px);
+      opacity: 0;
+      animation: fadeUp 1s ease .25s forwards;
+    }
+    @keyframes fadeUp{
+      to{ transform: translateY(0); opacity: 1; }
+    }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(124,92,255,0.12);
+      border: 1px solid rgba(124,92,255,0.35);
+      color: #d8d2ff;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .3px;
+      box-shadow: 0 0 0 4px rgba(124,92,255,0.06);
+    }
+    .badge .pulse{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--brand2);
+      box-shadow: 0 0 12px var(--brand2);
+      animation: pulse 1.8s ease infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); opacity: .7; }
+      50%{ transform: scale(1.8); opacity: 1; }
+    }
+
+    h1{
+      font-size: clamp(28px, 4vw, 46px);
+      margin: 14px 0 8px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .grad{
+      background: linear-gradient(90deg, #fff, #c0c9ff 30%, #9fe7ff 60%, #d7ffb0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .sub{
+      color: var(--muted);
+      font-size: clamp(14px, 2.2vw, 17px);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .hero-actions{ display:flex; flex-wrap:wrap; gap:10px; }
+    .mini{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* Widget card */
+    .widget-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      box-shadow: var(--shadow-glow);
+      height: 100%;
+      min-height: 360px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+      transform: translateY(12px);
+      opacity:0;
+      animation: fadeUp 1s ease .45s forwards;
+    }
+    .widget-header{
+      display:flex; justify-content: space-between; align-items:center;
+      padding: 6px 4px 10px;
+    }
+    .widget-title{
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .widget-sub{
+      font-size: 12px; color: var(--muted);
+    }
+    .widget-shell{
+      position: relative;
+      flex: 1;
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(300px 200px at 10% 0%, rgba(124,92,255,.12), transparent 50%),
+        radial-gradient(300px 220px at 90% 10%, rgba(34,211,238,.11), transparent 55%),
+        rgba(0,0,0,.25);
+      border: 1px dashed rgba(255,255,255,0.14);
+      overflow:hidden;
+    }
+    .widget-hint{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events:none;
+      animation: shimmer 2.6s ease infinite;
+      text-align:center;
+      padding: 18px;
+    }
+    @keyframes shimmer{
+      0%,100%{ opacity:.45; }
+      50%{ opacity:.9; }
+    }
+
+    /* Features */
+    .section{
+      margin-top: 26px;
+      padding-top: 8px;
+    }
+    .section h2{
+      font-size: clamp(20px, 3vw, 28px);
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+    }
+    .grid{
+      display:grid; gap: 12px;
+      grid-template-columns: repeat(3,1fr);
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .feat{
+      background: var(--bg-soft);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      transform: translateY(8px);
+      opacity: 0;
+      animation: fadeUp .9s ease forwards;
+    }
+    .feat:nth-child(1){ animation-delay: .1s;}
+    .feat:nth-child(2){ animation-delay: .2s;}
+    .feat:nth-child(3){ animation-delay: .3s;}
+    .feat:nth-child(4){ animation-delay: .4s;}
+    .feat:nth-child(5){ animation-delay: .5s;}
+    .feat:nth-child(6){ animation-delay: .6s;}
+    .feat .icon{
+      width: 36px; height:36px; border-radius: 12px;
+      display:grid; place-items:center;
+      background: rgba(124,92,255,.12);
+      border: 1px solid rgba(124,92,255,.35);
+      margin-bottom: 8px;
+      font-weight: 800;
+      color:#ddd7ff;
+    }
+    .feat p{
+      color: var(--muted);
+      font-size: 14px; line-height: 1.6; margin:0;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 26px;
+      padding: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      background: var(--bg-softer);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius-lg);
+      display:flex; justify-content: space-between; align-items:center; gap:10px;
+    }
+    footer a{ color: var(--text); text-decoration:none; font-weight:700; }
+    footer a:hover{ text-decoration: underline; }
+
+    /* Scroll reveal */
+    .reveal{
+      opacity: 0;
+      transform: translateY(14px) scale(.98);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible{
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Floating help button (optional) */
+    .float-btn{
+      position: fixed;
+      right: 18px; bottom: 18px;
+      z-index: 9999;
+      border-radius: 999px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, var(--brand1), var(--brand2));
+      color:white;
+      font-weight:800;
+      border:none; cursor:pointer;
+      box-shadow: 0 14px 40px rgba(124,92,255,.4);
+      display:flex; align-items:center; gap:8px;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: popIn .9s ease 1.2s forwards;
+    }
+    @keyframes popIn{ to{ transform: translateY(0); opacity:1; } }
+  </style>
+</head>
+
+<body>
+  <!-- Ambient blobs -->
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <!-- NAV -->
+  <div class="container">
+    <nav aria-label="Primary">
+      <div class="brand">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>SpinaBot</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#widget">Widget</a>
+        <a href="#support">Support</a>
+      </div>
+      <div class="cta">
+        <button class="btn secondary" id="themeBtn" type="button">Toggle Glow</button>
+        <button class="btn" type="button" onclick="document.querySelector('#widget').scrollIntoView({behavior:'smooth'})">
+          Try the Bot
+        </button>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-card reveal">
+        <div class="badge">
+          <span class="pulse" aria-hidden="true"></span>
+          LIVE AI SUPPORT
+        </div>
+        <h1>
+          Your smart assistant,
+          <span class="grad">right on this page</span>.
+        </h1>
+        <p class="sub">
+          This is a modern landing page wired to your SpinaBot widget.
+          Smooth motion, clean layout, and a dedicated container where the bot loads instantly.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn" type="button"
+                  onclick="document.querySelector('#widget').scrollIntoView({behavior:'smooth'})">
+            Open Chat
+          </button>
+          <button class="btn secondary" type="button"
+                  onclick="document.querySelector('#features').scrollIntoView({behavior:'smooth'})">
+            See Features
+          </button>
+        </div>
+        <div class="mini">Tip: the bot appears on the right panel and/or floating button depending on widget config.</div>
+      </div>
+
+      <!-- WIDGET AREA -->
+      <aside id="widget" class="widget-card reveal" aria-live="polite">
+        <div class="widget-header">
+          <div>
+            <div class="widget-title">SpinaBot Widget</div>
+            <div class="widget-sub">Embedded experience</div>
+          </div>
+          <div class="badge" style="background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.38);color:#c9f7ff;">
+            SECURE
+          </div>
+        </div>
+
+        <!-- Container where your widget script will inject UI -->
+        <div class="widget-shell" id="spinabot-container">
+          <div class="widget-hint">
+            Loading your bot…<br/>
+            If it doesn’t show, check your organization id or widget settings.
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <h2 class="reveal">Why this setup feels premium</h2>
+      <div class="grid">
+        <div class="feat reveal">
+          <div class="icon">⚡</div>
+          <strong>Fast load</strong>
+          <p>Minimal assets, preconnected fonts, and smooth transitions.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="icon">✨</div>
+          <strong>Modern motion</strong>
+          <p>Soft glow, floating gradients, and subtle scroll-reveal.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="icon">🧊</div>
+          <strong>Glass UI</strong>
+          <p>Layered blur and depth for a clean, “pro” aesthetic.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="icon">📱</div>
+          <strong>Responsive</strong>
+          <p>Stacks nicely on mobile, no layout jumps.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="icon">🔒</div>
+          <strong>Safe embed</strong>
+          <p>Widget loads via external script, isolated from your styles.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="icon">🎯</div>
+          <strong>Clear CTA</strong>
+          <p>Buttons guide users to the bot without distraction.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUPPORT / FOOTER -->
+    <section id="support" class="section">
+      <footer class="reveal">
+        <div>© <span id="year"></span> SpinaBot Experience</div>
+        <div>
+          Need help? <a href="#widget" onclick="document.querySelector('#widget').scrollIntoView({behavior:'smooth'})">Open chat</a>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <!-- Floating button that nudges users to open the bot -->
+  <button class="float-btn" type="button"
+          onclick="document.querySelector('#widget').scrollIntoView({behavior:'smooth'})">
+    💬 Chat with SpinaBot
+  </button>
+
+  <!-- Your SpinaBot widget script -->
+  <script src="https://widget.spinabot.com/widget.js"
+          data-organization-id="org_35oRK2PlOLRFHzhn0tUPgUh8v7J"></script>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scroll reveal
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Optional: Toggle extra glow mode
+    const themeBtn = document.getElementById('themeBtn');
+    let glowOn = true;
+    themeBtn.addEventListener('click', () => {
+      glowOn = !glowOn;
+      document.documentElement.style.setProperty('--ring',
+        glowOn ? 'rgba(124,92,255,0.5)' : 'rgba(34,211,238,0.45)');
+      document.body.style.background = glowOn
+        ? `radial-gradient(1200px 700px at 10% -10%, rgba(124,92,255,.25), transparent 60%),
+           radial-gradient(1000px 800px at 110% 0%, rgba(34,211,238,.18), transparent 55%),
+           radial-gradient(1200px 900px at 50% 120%, rgba(163,230,53,.10), transparent 60%),
+           var(--bg)`
+        : `radial-gradient(1100px 800px at 40% -10%, rgba(34,211,238,.18), transparent 60%),
+           radial-gradient(900px 700px at 110% 10%, rgba(124,92,255,.14), transparent 55%),
+           radial-gradient(1200px 900px at 50% 120%, rgba(163,230,53,.08), transparent 60%),
+           var(--bg)`;
+      themeBtn.textContent = glowOn ? 'Toggle Glow' : 'Toggle Glow On';
+    });
+
+    // Smooth in-page anchor behavior for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>
